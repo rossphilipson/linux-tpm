@@ -71,7 +71,9 @@ static inline int tpm_buf_init(struct tpm_buf *buf, u16 tag, u32 ordinal)
 
 static inline void tpm_buf_destroy(struct tpm_buf *buf)
 {
+#ifndef COMPRESSED_KERNEL
 	free_page((unsigned long)buf->data);
+#endif
 }
 
 static inline u32 tpm_buf_length(struct tpm_buf *buf)
@@ -100,7 +102,9 @@ static inline void tpm_buf_append(struct tpm_buf *buf,
 		return;
 
 	if ((len + new_len) > PAGE_SIZE) {
+#ifndef COMPRESSED_KERNEL
 		WARN(1, "tpm_buf: overflow\n");
+#endif
 		buf->flags |= TPM_BUF_OVERFLOW;
 		return;
 	}
@@ -118,14 +122,14 @@ static inline void tpm_buf_append_u16(struct tpm_buf *buf, const u16 value)
 {
 	__be16 value2 = cpu_to_be16(value);
 
-	tpm_buf_append(buf, (u8 *) &value2, 2);
+	tpm_buf_append(buf, (u8 *)&value2, 2);
 }
 
 static inline void tpm_buf_append_u32(struct tpm_buf *buf, const u32 value)
 {
 	__be32 value2 = cpu_to_be32(value);
 
-	tpm_buf_append(buf, (u8 *) &value2, 4);
+	tpm_buf_append(buf, (u8 *)&value2, 4);
 }
 
 #endif
